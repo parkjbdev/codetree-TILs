@@ -95,7 +95,6 @@ def solution(R, C, K, GOLEMS):
 
     answer = 0
     MAP = [[0] * C for _ in range(R)]
-    SCORE = [0 for _ in range(K)]
 
     dxs = [-1, 0, 1, 0]
     dys = [0, 1, 0, -1]
@@ -169,7 +168,6 @@ def solution(R, C, K, GOLEMS):
                         q.append((nx, ny))
                         visited[nx][ny] = True
 
-        SCORE[i] = final_score
         answer += final_score
 
         print(f"Answer added by {final_score} = {answer}")
@@ -186,9 +184,7 @@ def blockPrint():
 # Restore
 def enablePrint():
     sys.stdout = sys.__stdout__
-
-
-# sys.stdin = open("input33.txt")
+    
 
 R, C, K = map(int, input().split())
 GOLEMS = [list(map(int, input().split())) for _ in range(K)]
