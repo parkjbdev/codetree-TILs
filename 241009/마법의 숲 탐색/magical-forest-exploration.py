@@ -1,5 +1,6 @@
 import sys
 import os
+from collections import deque
 
 
 def solution(R, C, K, GOLEMS):
@@ -73,7 +74,6 @@ def solution(R, C, K, GOLEMS):
         return is_east_movable(x, y) and is_south_movable(x, y + 1)
 
     def move(x, y, d):
-        print("***** Start of while loop *****")
         while is_movable(x, y):
             if is_south_movable(x, y):
                 x += 1
@@ -90,22 +90,22 @@ def solution(R, C, K, GOLEMS):
                 d += 1
                 d %= 4
                 print(f"-- Rotate East: {x}, {y}, {d}")
-            print("  *** loop ***   ")
-        print("***** End of while loop *****")
 
         return x, y, d
-
 
     answer = 0
     MAP = [[0] * C for _ in range(R)]
     SCORE = [0 for _ in range(K)]
+
+    dxs = [-1, 0, 1, 0]
+    dys = [0, 1, 0, -1]
 
     for i, golem in enumerate(GOLEMS):
         x, y = -2, golem[0] - 1
         d = golem[1]
 
         # score_count = True
-        print(f"Golem #{i} Start: {x}, {y}, {d}")
+        print(f"Golem #{i} Start: ({x}, {y}), {d}")
         x, y, d = move(x, y, d)
 
         # 아직 밖일 경우
@@ -121,43 +121,53 @@ def solution(R, C, K, GOLEMS):
         MAP[x - 1][y] = i + 1
         MAP[x + 1][y] = i + 1
 
-        print(*MAP, sep="\n")
+        for ii in range(R):
+            if ii == 0:
+                print("+" + "--" * (C * 2 - 1) + "-" + "+")
+            for jj in range(C):
+                if jj == 0:
+                    print("|", end="")
+                if MAP[ii][jj] == 0:
+                    print("   ", end=" ")
+                else:
+                    print(f"{format(MAP[ii][jj], '03')}", end=" ")
+                if jj == C - 1:
+                    print("\b|", end="")
+            if ii == R - 1:
+                print("\n+" + "--" * (C * 2 - 1) + "-" + "+")
+            print()
 
         print(f'Rotation: {["북", "동", "남", "서"][d]}')
 
         final_score = x + 2
-        if d == 0:
-            x -= 1
-            if MAP[x][y - 1] != 0:
-                final_score = max(final_score, SCORE[MAP[x][y - 1] - 1])
-            if MAP[x - 1][y] != 0:
-                final_score = max(final_score, SCORE[MAP[x - 1][y] - 1])
-            if MAP[x][y + 1] != 0:
-                final_score = max(final_score, SCORE[MAP[x][y + 1] - 1])
-        elif d == 1:
-            y += 1
-            if MAP[x - 1][y] != 0:
-                final_score = max(final_score, SCORE[MAP[x - 1][y] - 1])
-            if y + 1 < C and MAP[x][y + 1] != 0:
-                final_score = max(final_score, SCORE[MAP[x][y + 1] - 1])
-            if MAP[x + 1][y] != 0:
-                final_score = max(final_score, SCORE[MAP[x + 1][y] - 1])
-        elif d == 2:
-            x += 1
-            if MAP[x][y - 1] != 0:
-                final_score = max(final_score, SCORE[MAP[x][y - 1] - 1])
-            if x + 1 < R and MAP[x + 1][y] != 0:
-                final_score = max(final_score, SCORE[MAP[x + 1][y] - 1])
-            if MAP[x][y + 1] != 0:
-                final_score = max(final_score, SCORE[MAP[x][y + 1] - 1])
-        elif d == 3:
-            y -= 1
-            if MAP[x - 1][y] != 0:
-                final_score = max(final_score, SCORE[MAP[x - 1][y] - 1])
-            if y - 1 >= 0 and MAP[x][y - 1] != 0:
-                final_score = max(final_score, SCORE[MAP[x][y - 1] - 1])
-            if MAP[x + 1][y] != 0:
-                final_score = max(final_score, SCORE[MAP[x + 1][y] - 1])
+
+        # bfs
+        q = deque()
+        q.append((x, y))
+        visited = [[False] * C for _ in range(R)]
+        visited[x][y] = True
+
+        print("BFS Start.. Final Score:", final_score)
+        while q:
+            x, y = q.popleft()
+            print(x, y)
+            if final_score < x + 1:
+                print("Score Updated to", x + 1)
+                final_score = x + 1
+
+            for i, (dx, dy) in enumerate(zip(dxs, dys)):
+                nx, ny = x + dx, y + dy
+                if not (0 <= nx < R and 0 <= ny < C):
+                    continue
+                if visited[nx][ny] or MAP[nx][ny] == 0:
+                    continue
+                if MAP[nx][ny] == MAP[x][y]:
+                    q.append((nx, ny))
+                    visited[nx][ny] = True
+                else:
+                    if GOLEMS[MAP[x][y] - 1][1] == i:
+                        q.append((nx, ny))
+                        visited[nx][ny] = True
 
         SCORE[i] = final_score
         answer += final_score
@@ -178,30 +188,7 @@ def enablePrint():
     sys.stdout = sys.__stdout__
 
 
-# # TestCase 1
-# test1 = solution(6, 5, 6, [[2, 3], [2, 0], [4, 2], [2, 0], [2, 0], [2, 2]])
-# print(test1)
-
-# # TestCase 2
-# blockPrint()
-# test2 = solution(7, 9, 6, [[4, 1], [5, 1], [2, 1], [8, 1], [2, 2], [6, 0]])
-# enablePrint()
-# print(test2)
-
-# R, C, K = 6, 7, 11
-# GOLEMS = [
-#     [3, 0],
-#     [4, 0],
-#     [2, 2],
-#     [6, 2],
-#     [6, 1],
-#     [5, 0],
-#     [5, 2],
-#     [5, 3],
-#     [6, 2],
-#     [5, 0],
-#     [4, 1],
-# ]
+sys.stdin = open("input33.txt")
 
 R, C, K = map(int, input().split())
 GOLEMS = [list(map(int, input().split())) for _ in range(K)]
