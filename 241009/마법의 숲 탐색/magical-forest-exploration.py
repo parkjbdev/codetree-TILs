@@ -188,7 +188,7 @@ def enablePrint():
     sys.stdout = sys.__stdout__
 
 
-sys.stdin = open("input33.txt")
+# sys.stdin = open("input33.txt")
 
 R, C, K = map(int, input().split())
 GOLEMS = [list(map(int, input().split())) for _ in range(K)]
