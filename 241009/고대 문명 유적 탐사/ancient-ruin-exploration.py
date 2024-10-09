@@ -1,3 +1,6 @@
+# 고대 문명 유적 탐사
+# https://www.codetree.ai/training-field/frequent-problems/problems/ancient-ruin-exploration/description?page=1&pageSize=20
+
 from heapq import heappush, heappop
 
 
@@ -64,6 +67,9 @@ def solution(K, M, MAP, MS):
 
     while turn < K:
         # finding the best rotation
+        # (1) 유물 1차 획득 가치를 최대화
+        # (2) 회전한 각도가 가장 작은 방법을 선택합니다.
+        # (3) 회전 중심 좌표의 열(y)이 가장 작은 구간을, 그리고 열이 같다면 행(x)이 가장 작은 구간을 선택합니다.
         best = (0, 3, 4, 4, [])
         for i in range(1, 4):
             for j in range(1, 4):
@@ -99,6 +105,7 @@ def solution(K, M, MAP, MS):
         turn += 1
 
     print(*answer)
+
 
 K, M = map(int, input().split())
 MAP = [list(map(int, input().split())) for _ in range(5)]
