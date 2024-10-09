@@ -1,5 +1,3 @@
-import sys
-import os
 from collections import deque
 
 
@@ -11,9 +9,7 @@ def solution(R, C, K, GOLEMS):
 
     def is_south_movable(x, y):
         nx, ny = x + 1, y
-        if nx < -1:
-            raise Exception
-        elif nx == -1:  # 머리만 체크
+        if nx == -1:  # 머리만 체크
             return MAP[nx + 1][ny] == 0  # 머리부분
         else:
             return (
@@ -25,8 +21,6 @@ def solution(R, C, K, GOLEMS):
 
     def is_west_movable(x, y):
         nx, ny = x, y - 1
-        if nx < -2:
-            raise Exception
         if ny - 1 < 0:
             return False
         elif nx == -2:
@@ -47,8 +41,6 @@ def solution(R, C, K, GOLEMS):
 
     def is_east_movable(x, y):
         nx, ny = x, y + 1
-        if nx < -2:
-            raise Exception
         if ny + 1 >= C:
             return False
         elif nx == -2:
@@ -77,19 +69,16 @@ def solution(R, C, K, GOLEMS):
         while is_movable(x, y):
             if is_south_movable(x, y):
                 x += 1
-                print(f"-- Move South: {x}, {y}, {d}")
             elif is_west_rotatable(x, y):
                 x += 1
                 y -= 1
                 d += 3
                 d %= 4
-                print(f"-- Rotate West: {x}, {y}, {d}")
             elif is_east_rotatable(x, y):
                 x += 1
                 y += 1
                 d += 1
                 d %= 4
-                print(f"-- Rotate East: {x}, {y}, {d}")
 
         return x, y, d
 
@@ -104,7 +93,6 @@ def solution(R, C, K, GOLEMS):
         d = golem[1]
 
         # score_count = True
-        print(f"Golem #{i} Start: ({x}, {y}), {d}")
         x, y, d = move(x, y, d)
 
         # 아직 밖일 경우
@@ -120,24 +108,6 @@ def solution(R, C, K, GOLEMS):
         MAP[x - 1][y] = i + 1
         MAP[x + 1][y] = i + 1
 
-        for ii in range(R):
-            if ii == 0:
-                print("+" + "--" * (C * 2 - 1) + "-" + "+")
-            for jj in range(C):
-                if jj == 0:
-                    print("|", end="")
-                if MAP[ii][jj] == 0:
-                    print("   ", end=" ")
-                else:
-                    print(f"{format(MAP[ii][jj], '03')}", end=" ")
-                if jj == C - 1:
-                    print("\b|", end="")
-            if ii == R - 1:
-                print("\n+" + "--" * (C * 2 - 1) + "-" + "+")
-            print()
-
-        print(f'Rotation: {["북", "동", "남", "서"][d]}')
-
         final_score = x + 2
 
         # bfs
@@ -146,13 +116,9 @@ def solution(R, C, K, GOLEMS):
         visited = [[False] * C for _ in range(R)]
         visited[x][y] = True
 
-        print("BFS Start.. Final Score:", final_score)
         while q:
             x, y = q.popleft()
-            print(x, y)
-            if final_score < x + 1:
-                print("Score Updated to", x + 1)
-                final_score = x + 1
+            final_score = max(final_score, x + 1)
 
             for i, (dx, dy) in enumerate(zip(dxs, dys)):
                 nx, ny = x + dx, y + dy
@@ -160,36 +126,15 @@ def solution(R, C, K, GOLEMS):
                     continue
                 if visited[nx][ny] or MAP[nx][ny] == 0:
                     continue
-                if MAP[nx][ny] == MAP[x][y]:
+                if MAP[nx][ny] == MAP[x][y] or GOLEMS[MAP[x][y] - 1][1] == i:
                     q.append((nx, ny))
                     visited[nx][ny] = True
-                else:
-                    if GOLEMS[MAP[x][y] - 1][1] == i:
-                        q.append((nx, ny))
-                        visited[nx][ny] = True
 
         answer += final_score
-
-        print(f"Answer added by {final_score} = {answer}")
-        print()
 
     return answer
 
 
-# Disable
-def blockPrint():
-    sys.stdout = open(os.devnull, "w")
-
-
-# Restore
-def enablePrint():
-    sys.stdout = sys.__stdout__
-    
-
 R, C, K = map(int, input().split())
 GOLEMS = [list(map(int, input().split())) for _ in range(K)]
-
-blockPrint()
-result = solution(R, C, K, GOLEMS)
-enablePrint()
-print(result)
+print(solution(R, C, K, GOLEMS))
