@@ -1,15 +1,4 @@
-# 고대 문명 유적 탐사
-# https://www.codetree.ai/training-field/frequent-problems/problems/ancient-ruin-exploration/description?page=1&pageSize=20
-
-# (1) 유물 1차 획득 가치를 최대화
-# (2) 회전한 각도가 가장 작은 방법을 선택합니다.
-# (3) 회전 중심 좌표의 열이 가장 작은 구간을, 그리고 열이 같다면 행이 가장 작은 구간을 선택합니다.
-
 from heapq import heappush, heappop
-
-
-def print2(arr):
-    print(*arr, sep="\n")
 
 
 def solution(K, M, MAP, MS):
@@ -52,7 +41,6 @@ def solution(K, M, MAP, MS):
         heappush(q, (x, y))
         visited[x][y] = True
 
-        # TODO
         ret = []
 
         while q:
@@ -83,18 +71,15 @@ def solution(K, M, MAP, MS):
                     ROTMAP = rotated(i, j, rot)
                     result = search_treasure(ROTMAP)
                     if len(result) >= 3:
-                        best = min(best, (-len(result), rot, i, j, result))
+                        best = min(best, (-len(result), rot, j, i, result))
 
-        score, rot, x, y, q = best
+        score, rot, y, x, q = best
         score = -score
 
         if score < 3:
             break
 
-        # print()
-        # print("best(score, rot, x, y, q): ", score, rot, x, y, q)
         MAP = rotated(x, y, rot)
-        # print2(MAP)
 
         answer.append(0)
         answer[turn] += score
@@ -111,43 +96,10 @@ def solution(K, M, MAP, MS):
                 break
             answer[turn] += len(q)
 
-            # print("combo", q)
-            # print2(MAP)
-
         turn += 1
 
     print(*answer)
 
-
-# K, M = 2, 20
-# MAP = [
-#     list(map(int, "7 6 7 6 7".split())),
-#     list(map(int, "6 7 6 7 6".split())),
-#     list(map(int, "6 7 1 5 4".split())),
-#     list(map(int, "7 6 3 2 1".split())),
-#     list(map(int, "5 4 3 2 7".split())),
-# ]
-# MS = list(map(int, "3 2 3 5 2 4 6 1 3 2 5 6 2 1 5 6 7 1 2 3".split()))
-# K, M = 1, 18
-# MAP = [
-#     [3, 5, 6, 7, 3],
-#     [7, 7, 5, 7, 4],
-#     [2, 6, 1, 5, 2],
-#     [2, 7, 2, 7, 5],
-#     [6, 2, 6, 7, 6],
-# ]
-# MS = [5, 2, 4, 3, 1, 5, 5, 1, 1, 7, 3, 5, 7, 4, 3, 5, 4, 2]
-
-# K, M = 9, 52
-# MAP = [
-#     [6, 7, 5, 5, 7],
-#     [3, 7, 3, 6, 2],
-#     [7, 2, 3, 2, 1],
-#     [3, 6, 7, 1, 5],
-#     [1, 5, 5, 2, 1],
-# ]
-# # fmt: off
-# MS = [3,1,5,4,6,3,3,6,5,3,3,6,3,4,3,1,1,2,3,1,3,4,2,4,1,1,4,4,1,1,4,4,2,3,4,6,6,3,6,2,2,2,4,3,1,3,1,5,4,5,6,4]
 K, M = map(int, input().split())
 MAP = [list(map(int, input().split())) for _ in range(5)]
 MS = list(map(int, input().split()))
