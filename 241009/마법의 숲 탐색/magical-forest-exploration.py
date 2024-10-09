@@ -1,24 +1,3 @@
-# R, C: 숲의 크기
-# K: 정령의 수
-# c_i: 골렘이 출발하는 열
-# d_i: 골렘의 출구방향 정보
-
-# 탐색 우선순위
-# 1) 남쪽으로 한칸
-# 2) 서쪽으로 회전 (서쪽으로 한칸, 남쪽으로 한칸, 출구 반시계방향 회전)
-# 3) 동쪽으로 회전 (동쪽으로 한칸, 남쪽으로 한칸, 출구 시계방향 회전)
-# 4) 가장 남쪽에 도달하여 더이상 이동할수 없을경우, 상하좌우 인접칸 이동..
-# 단, 현재 골렘의 출구가 다른 골렘과 인접 시, 해당 출구를 통해 다른 골렘으로 이동가능
-
-# 정령이 이동할 수 있는 가장 남쪽칸의 총합
-
-# 만약 골렘이 최대한 남쪽으로 이동했지만 골렘의 몸 일부가 여전히 숲을 벗어난 상태라면,
-# 해당 골렘을 포함해 숲에 위치한 모든 골렘들은 숲을 빠져나간 뒤
-# 다음 골렘부터 새롭게 숲의 탐색을 시작합니다.
-# 단, 이 경우에는 정령이 도달하는 최종 위치를 답에 포함시키지 않습니다.
-
-# 북, 동, 남, 서
-# 0, 1, 2, 3
 import sys
 import os
 
@@ -93,23 +72,7 @@ def solution(R, C, K, GOLEMS):
     def is_east_rotatable(x, y):
         return is_east_movable(x, y) and is_south_movable(x, y + 1)
 
-    answer = 0
-    MAP = [[0] * C for _ in range(R)]
-    SCORE = [0 for _ in range(K)]
-
-    for i, golem in enumerate(GOLEMS):
-        x, y = -2, golem[0] - 1
-        d = golem[1]
-
-        movable = is_movable(x, y)
-
-        print(f"Golem #{i} Start: {x}, {y}, {d}")
-        print(f"First Movability Test: {movable}")
-
-        if not movable:
-            MAP = [[0] * C for _ in range(R)]
-
-        # 내려갈수 있는지 판단
+    def move(x, y, d):
         print("***** Start of while loop *****")
         while is_movable(x, y):
             if is_south_movable(x, y):
@@ -129,6 +92,30 @@ def solution(R, C, K, GOLEMS):
                 print(f"-- Rotate East: {x}, {y}, {d}")
             print("  *** loop ***   ")
         print("***** End of while loop *****")
+
+        return x, y, d
+
+
+    answer = 0
+    MAP = [[0] * C for _ in range(R)]
+    SCORE = [0 for _ in range(K)]
+
+    for i, golem in enumerate(GOLEMS):
+        x, y = -2, golem[0] - 1
+        d = golem[1]
+
+        score_count = True
+        print(f"Golem #{i} Start: {x}, {y}, {d}")
+        x, y, d = move(x, y, d)
+
+        # 아직 밖일 경우
+        if x - 1 < 0:
+            print("MAP FULL!!!")
+            score_count = False
+            MAP = [[0] * C for _ in range(R)]
+            x, y, d = -2, golem[0] - 1, golem[1]
+            x, y, d = move(x, y, d)
+
 
         GOLEMS[i][1] = d
 
@@ -177,7 +164,7 @@ def solution(R, C, K, GOLEMS):
                 final_score = max(final_score, SCORE[MAP[x + 1][y] - 1])
 
         SCORE[i] = final_score
-        if movable:
+        if score_count:
             answer += final_score
 
             print(f"Answer added by {final_score} = {answer}")
@@ -197,18 +184,33 @@ def enablePrint():
 
 
 # TestCase 1
-# blockPrint()
 # test1 = solution(6, 5, 6, [[2, 3], [2, 0], [4, 2], [2, 0], [2, 0], [2, 2]])
 # print(test1)
 
-# TestCase 2
+# # TestCase 2
 # blockPrint()
 # test2 = solution(7, 9, 6, [[4, 1], [5, 1], [2, 1], [8, 1], [2, 2], [6, 0]])
 # enablePrint()
 # print(test2)
 
+# R, C, K = 6, 7, 11
+# GOLEMS = [
+#     [3, 0],
+#     [4, 0],
+#     [2, 2],
+#     [6, 2],
+#     [6, 1],
+#     [5, 0],
+#     [5, 2],
+#     [5, 3],
+#     [6, 2],
+#     [5, 0],
+#     [4, 1],
+# ]
+
 R, C, K = map(int, input().split())
 GOLEMS = [list(map(int, input().split())) for _ in range(K)]
+
 blockPrint()
 result = solution(R, C, K, GOLEMS)
 enablePrint()
