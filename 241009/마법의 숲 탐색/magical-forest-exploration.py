@@ -104,18 +104,14 @@ def solution(R, C, K, GOLEMS):
         x, y = -2, golem[0] - 1
         d = golem[1]
 
-        score_count = True
+        # score_count = True
         print(f"Golem #{i} Start: {x}, {y}, {d}")
         x, y, d = move(x, y, d)
 
         # 아직 밖일 경우
         if x - 1 < 0:
-            print("MAP FULL!!!")
-            score_count = False
             MAP = [[0] * C for _ in range(R)]
-            x, y, d = -2, golem[0] - 1, golem[1]
-            x, y, d = move(x, y, d)
-
+            continue
 
         GOLEMS[i][1] = d
 
@@ -164,11 +160,10 @@ def solution(R, C, K, GOLEMS):
                 final_score = max(final_score, SCORE[MAP[x + 1][y] - 1])
 
         SCORE[i] = final_score
-        if score_count:
-            answer += final_score
+        answer += final_score
 
-            print(f"Answer added by {final_score} = {answer}")
-            print()
+        print(f"Answer added by {final_score} = {answer}")
+        print()
 
     return answer
 
@@ -183,7 +178,7 @@ def enablePrint():
     sys.stdout = sys.__stdout__
 
 
-# TestCase 1
+# # TestCase 1
 # test1 = solution(6, 5, 6, [[2, 3], [2, 0], [4, 2], [2, 0], [2, 0], [2, 2]])
 # print(test1)
 
