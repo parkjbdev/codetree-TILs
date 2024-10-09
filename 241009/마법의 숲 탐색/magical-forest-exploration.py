@@ -4,7 +4,9 @@ from collections import deque
 def solution(R, C, K, GOLEMS):
     def is_movable(x, y):
         return (
-            is_south_movable(x, y) or is_west_rotatable(x, y) or is_east_rotatable(x, y)
+            is_south_movable(x, y),
+            is_west_rotatable(x, y),
+            is_east_rotatable(x, y),
         )
 
     def is_south_movable(x, y):
@@ -66,19 +68,21 @@ def solution(R, C, K, GOLEMS):
         return is_east_movable(x, y) and is_south_movable(x, y + 1)
 
     def move(x, y, d):
-        while is_movable(x, y):
-            if is_south_movable(x, y):
+        movable = is_movable(x, y)
+        while any(movable):
+            if movable[0]:
                 x += 1
-            elif is_west_rotatable(x, y):
+            elif movable[1]:
                 x += 1
                 y -= 1
                 d += 3
                 d %= 4
-            elif is_east_rotatable(x, y):
+            elif movable[2]:
                 x += 1
                 y += 1
                 d += 1
                 d %= 4
+            movable = is_movable(x, y)
 
         return x, y, d
 
@@ -137,4 +141,5 @@ def solution(R, C, K, GOLEMS):
 
 R, C, K = map(int, input().split())
 GOLEMS = [list(map(int, input().split())) for _ in range(K)]
+
 print(solution(R, C, K, GOLEMS))
