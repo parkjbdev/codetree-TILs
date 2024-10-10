@@ -100,25 +100,43 @@ def solution(L, CHESS_MAP, N, KNIGHTS, Q, CMDS):
             ex += dx
             ey += dy
 
+        attacker_knight.move(direction, KNIGHT_MAP)
+        
         KNIGHT_MAP = [[None] * L for _ in range(L)]
         for knight in knights:
+            if knight is None: continue
             sx, sy = knight.x, knight.y
             ex, ey = knight.endx, knight.endy
             for i in range(sx, ex + 1):
                 for j in range(ex, ex + 1):
                     KNIGHT_MAP[i][j] = knight
-        (sx, sy), (ex, ey) = attacker_knight.move(direction, KNIGHT_MAP)
-        for i in range(sx, ex + 1):
-            for j in range(ex, ex + 1):
-                KNIGHT_MAP[i][j] = attacker_knight
+                    
+                    
         for knight_to_be_attacked in knights_to_be_attacked:
-            (sx, sy), (ex, ey) = knight_to_be_attacked.move(direction, KNIGHT_MAP)
-            for i in range(sx, ex + 1):
-                for j in range(ex, ex + 1):
-                    KNIGHT_MAP[i][j] = knight_to_be_attacked
+            knight_to_be_attacked.move(direction, KNIGHT_MAP)
+            
+            KNIGHT_MAP = [[None] * L for _ in range(L)]
+            for knight in knights:
+                if knight is None: continue
+                sx, sy = knight.x, knight.y
+                ex, ey = knight.endx, knight.endy
+                for i in range(sx, ex + 1):
+                    for j in range(ex, ex + 1):
+                        KNIGHT_MAP[i][j] = knight
+            
             if knight_to_be_attacked.lose_damage(CHESS_MAP) <= 0:
                 # killing attacked knight with no hp
                 knights[knight_to_be_attacked.id - 1] = None
+                
+        KNIGHT_MAP = [[None] * L for _ in range(L)]
+        for knight in knights:
+            if knight is None: continue
+            sx, sy = knight.x, knight.y
+            ex, ey = knight.endx, knight.endy
+            for i in range(sx, ex + 1):
+                for j in range(ex, ex + 1):
+                    KNIGHT_MAP[i][j] = knight
+                    
     return sum(list(map(lambda x: x.damage if x is not None else 0, knights)))
 
 
