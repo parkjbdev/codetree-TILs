@@ -101,6 +101,12 @@ def solution(L, CHESS_MAP, N, KNIGHTS, Q, CMDS):
             ey += dy
 
         KNIGHT_MAP = [[None] * L for _ in range(L)]
+        for knight in knights:
+            sx, sy = knight.x, knight.y
+            ex, ey = knight.endx, knight.endy
+            for i in range(sx, ex + 1):
+                for j in range(ex, ex + 1):
+                    KNIGHT_MAP[i][j] = knight
         (sx, sy), (ex, ey) = attacker_knight.move(direction, KNIGHT_MAP)
         for i in range(sx, ex + 1):
             for j in range(ex, ex + 1):
@@ -113,7 +119,6 @@ def solution(L, CHESS_MAP, N, KNIGHTS, Q, CMDS):
             if knight_to_be_attacked.lose_damage(CHESS_MAP) <= 0:
                 # killing attacked knight with no hp
                 knights[knight_to_be_attacked.id - 1] = None
-
     return sum(list(map(lambda x: x.damage if x is not None else 0, knights)))
 
 
