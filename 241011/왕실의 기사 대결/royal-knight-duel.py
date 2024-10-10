@@ -86,7 +86,7 @@ def solution(L, CHESS_MAP, N, KNIGHTS, Q, CMDS):
         while 0 <= sx <= ex < L and 0 <= sy <= ey < L:
             for i in range(sx, ex + 1):
                 for j in range(sy, ey + 1):
-                    if KNIGHT_MAP[i][j] != attacker_knight and KNIGHT_MAP[i][j] is not None:
+                    if KNIGHT_MAP[i][j] != attacker_knight and KNIGHT_MAP[i][j] is not None and KNIGHT_MAP[i][j].check_movable(direction, CHESS_MAP, KNIGHT_MAP):
                         knights_to_be_attacked.add(KNIGHT_MAP[i][j])
 
             sx += dx
