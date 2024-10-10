@@ -11,21 +11,14 @@ class Knight:
         self.damage = 0
 
     def __str__(self):
-        return f"{self.id} ({self.x}, {self.y})~({self.endx}, {self.endy})"
+        # return f"{self.id} ({self.x}, {self.y})~({self.endx}, g{self.endy})"
+        return f"{self.id}"
 
     def move(self, d, KNIGHT_MAP):
-        for i in range(self.x, self.endx + 1):
-            for j in range(self.y, self.endy + 1):
-                KNIGHT_MAP[i][j] = None
-
         self.x += DXS[d]
         self.y += DYS[d]
         self.endx += DXS[d]
         self.endy += DYS[d]
-
-        for i in range(self.x, self.endx + 1):
-            for j in range(self.y, self.endy + 1):
-                KNIGHT_MAP[i][j] = self
 
         return (self.x, self.y), (self.endx, self.endy)
 
@@ -107,9 +100,16 @@ def solution(L, CHESS_MAP, N, KNIGHTS, Q, CMDS):
             ex += dx
             ey += dy
 
-        attacker_knight.move(direction, KNIGHT_MAP)
+        KNIGHT_MAP = [[None] * L for _ in range(L)]
+        (sx, sy), (ex, ey) = attacker_knight.move(direction, KNIGHT_MAP)
+        for i in range(sx, ex + 1):
+            for j in range(ex, ex + 1):
+                KNIGHT_MAP[i][j] = attacker_knight
         for knight_to_be_attacked in knights_to_be_attacked:
-            knight_to_be_attacked.move(direction, KNIGHT_MAP)
+            (sx, sy), (ex, ey) = knight_to_be_attacked.move(direction, KNIGHT_MAP)
+            for i in range(sx, ex + 1):
+                for j in range(ex, ex + 1):
+                    KNIGHT_MAP[i][j] = knight_to_be_attacked
             if knight_to_be_attacked.lose_damage(CHESS_MAP) <= 0:
                 # killing attacked knight with no hp
                 knights[knight_to_be_attacked.id - 1] = None
