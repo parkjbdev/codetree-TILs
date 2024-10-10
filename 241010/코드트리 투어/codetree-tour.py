@@ -1,6 +1,5 @@
-from heapq import heappush, heappop
+from heapq import heappush, heappop, heapify
 from math import inf
-from array import array
 
 def solution(CMDS):
     def dijkstra(N, START_VERTEX, EDGES):
@@ -28,10 +27,12 @@ def solution(CMDS):
         return min_distance
 
     def update_pq(products, costs):
-        productq = []
+        ret = []
         for id, product in products.items():
-            heappush(productq, (costs[product["dest"]] - product["revenue"], id))
-        return productq
+            if costs[product["dest"]] < product["revenue"]:
+                heappush(ret, (costs[product["dest"]]-  product["revenue"], id))
+
+        return ret
 
     START_VERTEX = 0
     N = None
@@ -42,8 +43,7 @@ def solution(CMDS):
     productq = []
 
     # For Lazy Calculation
-    need_cost_calc = True
-    need_pq_update = False
+    need_cost_calc = False
 
     for cmd in CMDS:
         # 코드트리 랜드 건설
@@ -64,12 +64,8 @@ def solution(CMDS):
 
             if need_cost_calc:
                 min_costs = dijkstra(N, START_VERTEX, EDGES)
-                need_cost_calc = False
-                need_pq_update = True
-
-            if need_pq_update:
                 productq = update_pq(products, min_costs)
-                need_pq_update = False
+                need_cost_calc = False
 
             if min_costs[dest] <= revenue:
                 heappush(productq, (min_costs[dest] - revenue, id))
@@ -84,11 +80,8 @@ def solution(CMDS):
         elif cmd[0] == 400:
             if need_cost_calc:
                 min_costs = dijkstra(N, START_VERTEX, EDGES)
-                need_cost_calc = False
-                need_pq_update = True
-            if need_pq_update:
                 productq = update_pq(products, min_costs)
-                need_pq_update = False
+                need_cost_calc = False
 
             while productq:
                 profit, id = heappop(productq)
@@ -102,7 +95,6 @@ def solution(CMDS):
         elif cmd[0] == 500:
             START_VERTEX = cmd[1]
             need_cost_calc = True
-            need_pq_update = True
 
 Q = int(input())  # 명령의 수
 CMDS = [list(map(int, input().split())) for _ in range(Q)]
