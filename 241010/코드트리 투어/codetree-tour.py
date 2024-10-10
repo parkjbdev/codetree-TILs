@@ -85,6 +85,7 @@ def solution(CMDS):
             if need_cost_calc:
                 min_costs = dijkstra(N, START_VERTEX, EDGES)
                 need_cost_calc = False
+                need_pq_update = True
             if need_pq_update:
                 productq = update_pq(products, min_costs)
                 need_pq_update = False
