@@ -63,7 +63,7 @@ def solution(L, CHESS_MAP, N, KNIGHTS, Q, CMDS):
                 KNIGHT_MAP[i][j] = value
 
     def move_knightmap(direction, knight):
-        start, end = knight.x, knight.endx if direction % 2 == 1 else knight.y. knight.endy
+        start, end = (knight.x, knight.endx) if direction % 2 == 1 else (knight.y, knight.endy)
 
         if direction == 1:
             for i in range(start, end + 1):
