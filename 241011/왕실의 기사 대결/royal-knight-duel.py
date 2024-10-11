@@ -14,24 +14,24 @@ class Knight:
         return f"{self.id}"
 
     def move(self, d, KNIGHT_MAP):
-        start, end = (self.x, self.endx) if d % 2 == 1 else (self.y, self.endy)
-
-        if d == 1:
-            for i in range(start, end + 1):
-                for j in range(L):
-                    KNIGHT_MAP[i][L - j - 1] = KNIGHT_MAP[i][L - j - 2] if j != 0 else None
-        elif d == 3:
-            for i in range(start, end + 1):
-                for j in range(L):
-                    KNIGHT_MAP[i][j] = KNIGHT_MAP[i][j + 1] if j != L - 1 else None
-        elif d == 2:
-            for i in range(start, end + 1):
-                for j in range(L):
-                    KNIGHT_MAP[L - j - 1][i] = KNIGHT_MAP[L - j - 2][i] if j != 0 else None
-        elif d == 0:
-            for i in range(start, end + 1):
-                for j in range(L):
-                    KNIGHT_MAP[j][i] = KNIGHT_MAP[j + 1][i] if j != L - 1 else None
+        # start, end = (self.x, self.endx) if d % 2 == 1 else (self.y, self.endy)
+        #
+        # if d == 1:
+        #     for i in range(start, end + 1):
+        #         for j in range(L):
+        #             KNIGHT_MAP[i][L - j - 1] = KNIGHT_MAP[i][L - j - 2] if j != 0 else None
+        # elif d == 3:
+        #     for i in range(start, end + 1):
+        #         for j in range(L):
+        #             KNIGHT_MAP[i][j] = KNIGHT_MAP[i][j + 1] if j != L - 1 else None
+        # elif d == 2:
+        #     for i in range(start, end + 1):
+        #         for j in range(L):
+        #             KNIGHT_MAP[L - j - 1][i] = KNIGHT_MAP[L - j - 2][i] if j != 0 else None
+        # elif d == 0:
+        #     for i in range(start, end + 1):
+        #         for j in range(L):
+        #             KNIGHT_MAP[j][i] = KNIGHT_MAP[j + 1][i] if j != L - 1 else None
 
 
         self.x += DXS[d]
@@ -82,6 +82,11 @@ def solution(L, CHESS_MAP, N, KNIGHTS, Q, CMDS):
             for j in range(knight.y, knight.endy + 1):
                 KNIGHT_MAP[i][j] = value
 
+    def redraw_knightmap():
+        for knight in knights:
+            if knight is not None and knight.hp > 0:
+                assign_knightmap(knight, knight)
+
     # Knight Initialization
     KNIGHT_MAP = [[None] * L for _ in range(L)]
     knights = []
@@ -125,10 +130,12 @@ def solution(L, CHESS_MAP, N, KNIGHTS, Q, CMDS):
         attacker_knight.move(direction, KNIGHT_MAP)
 
         for knight_to_be_attacked in knights_to_be_attacked:
+            knight_to_be_attacked.move(direction, KNIGHT_MAP)
             if knight_to_be_attacked.lose_damage(CHESS_MAP) <= 0:
                 # killing attacked knight with no hp
                 knights[knight_to_be_attacked.id - 1] = None
-                assign_knightmap(knight_to_be_attacked, None)
+
+        redraw_knightmap()
 
 
     return sum(list(map(lambda x: x.damage if x is not None else 0, knights)))
