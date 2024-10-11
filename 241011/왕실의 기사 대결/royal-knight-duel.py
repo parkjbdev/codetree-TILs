@@ -82,7 +82,8 @@ def solution(L, CHESS_MAP, N, KNIGHTS, Q, CMDS):
             for j in range(knight.y, knight.endy + 1):
                 KNIGHT_MAP[i][j] = value
 
-    def redraw_knightmap():
+    def redraw_knightmap(KNIGHT_MAP, knights):
+        KNIGHT_MAP = [[None] * L for _ in range(L)]
         for knight in knights:
             if knight is not None and knight.hp > 0:
                 assign_knightmap(knight, knight)
@@ -97,7 +98,7 @@ def solution(L, CHESS_MAP, N, KNIGHTS, Q, CMDS):
         assign_knightmap(knight, knight)
 
     # Commands
-    for cmd in CMDS:
+    for i, cmd in enumerate(CMDS):
         knight_idx, direction = cmd[0] - 1, cmd[1]
         attacker_knight = knights[knight_idx]
         if attacker_knight is None: continue
@@ -135,7 +136,12 @@ def solution(L, CHESS_MAP, N, KNIGHTS, Q, CMDS):
                 # killing attacked knight with no hp
                 knights[knight_to_be_attacked.id - 1] = None
 
-        redraw_knightmap()
+        # redraw_knightmap(KNIGHT_MAP, knights)
+        KNIGHT_MAP = [[None] * L for _ in range(L)]
+        for knight in knights:
+            if knight is not None and knight.hp > 0:
+                assign_knightmap(knight, knight)
+        print()
 
 
     return sum(list(map(lambda x: x.damage if x is not None else 0, knights)))
