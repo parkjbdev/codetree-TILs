@@ -141,8 +141,6 @@ def solution(L, CHESS_MAP, N, KNIGHTS, Q, CMDS):
         for knight in knights:
             if knight is not None and knight.hp > 0:
                 assign_knightmap(knight, knight)
-        print()
-
 
     return sum(list(map(lambda x: x.damage if x is not None else 0, knights)))
 
