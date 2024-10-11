@@ -11,10 +11,9 @@ class Knight:
         self.damage = 0
 
     def __str__(self):
-        # return f"{self.id} ({self.x}, {self.y})~({self.endx}, g{self.endy})"
         return f"{self.id}"
 
-    def move(self, d, KNIGHT_MAP):
+    def move(self, d):
         self.x += DXS[d]
         self.y += DYS[d]
         self.endx += DXS[d]
@@ -58,6 +57,32 @@ class Knight:
 
 
 def solution(L, CHESS_MAP, N, KNIGHTS, Q, CMDS):
+    def assign_knightmap(knight, value):
+        for i in range(knight.x, knight.endx + 1):
+            for j in range(knight.y, knight.endy + 1):
+                KNIGHT_MAP[i][j] = value
+
+    def move_knightmap(direction, knight):
+        start, end = knight.x, knight.endx if direction % 2 == 1 else knight.y. knight.endy
+
+        if direction == 1:
+            for i in range(start, end + 1):
+                for j in range(L):
+                    KNIGHT_MAP[i][L - j - 1] = KNIGHT_MAP[i][L - j - 2] if j != 0 else None
+        elif direction == 3:
+            for i in range(start, end + 1):
+                for j in range(L):
+                    KNIGHT_MAP[i][j] = KNIGHT_MAP[i][j + 1] if j != L - 1 else None
+        elif direction == 2:
+            for i in range(start, end + 1):
+                for j in range(L):
+                    KNIGHT_MAP[L - j - 1][i] = KNIGHT_MAP[L - j - 2][i] if j != 0 else None
+        elif direction == 0:
+            for i in range(start, end + 1):
+                for j in range(L):
+                    KNIGHT_MAP[j][i] = KNIGHT_MAP[j + 1][i] if j != L - 1 else None
+
+
     # Knight Initialization
     KNIGHT_MAP = [[None] * L for _ in range(L)]
     knights = []
@@ -65,9 +90,7 @@ def solution(L, CHESS_MAP, N, KNIGHTS, Q, CMDS):
     for id, (r, c, h, w, k) in enumerate(KNIGHTS):
         knight = Knight(id + 1, r, c, h, w, k)
         knights.append(knight)
-        for x in range(knight.x, knight.endx + 1):
-            for y in range(knight.y, knight.endy + 1):
-                KNIGHT_MAP[x][y] = knight
+        assign_knightmap(knight, knight)
 
     # Commands
     for cmd in CMDS:
@@ -100,43 +123,19 @@ def solution(L, CHESS_MAP, N, KNIGHTS, Q, CMDS):
             ex += dx
             ey += dy
 
-        attacker_knight.move(direction, KNIGHT_MAP)
-        
-        KNIGHT_MAP = [[None] * L for _ in range(L)]
-        for knight in knights:
-            if knight is None: continue
-            sx, sy = knight.x, knight.y
-            ex, ey = knight.endx, knight.endy
-            for i in range(sx, ex + 1):
-                for j in range(ex, ex + 1):
-                    KNIGHT_MAP[i][j] = knight
-                    
-                    
+        move_knightmap(direction, attacker_knight)
+        attacker_knight.move(direction)
+
         for knight_to_be_attacked in knights_to_be_attacked:
-            knight_to_be_attacked.move(direction, KNIGHT_MAP)
-            
-            KNIGHT_MAP = [[None] * L for _ in range(L)]
-            for knight in knights:
-                if knight is None: continue
-                sx, sy = knight.x, knight.y
-                ex, ey = knight.endx, knight.endy
-                for i in range(sx, ex + 1):
-                    for j in range(ex, ex + 1):
-                        KNIGHT_MAP[i][j] = knight
-            
+            move_knightmap(direction, knight_to_be_attacked)
+            knight_to_be_attacked.move(direction)
+
             if knight_to_be_attacked.lose_damage(CHESS_MAP) <= 0:
                 # killing attacked knight with no hp
                 knights[knight_to_be_attacked.id - 1] = None
-                
-        KNIGHT_MAP = [[None] * L for _ in range(L)]
-        for knight in knights:
-            if knight is None: continue
-            sx, sy = knight.x, knight.y
-            ex, ey = knight.endx, knight.endy
-            for i in range(sx, ex + 1):
-                for j in range(ex, ex + 1):
-                    KNIGHT_MAP[i][j] = knight
-                    
+                assign_knightmap(knight_to_be_attacked, None)
+
+
     return sum(list(map(lambda x: x.damage if x is not None else 0, knights)))
 
 
